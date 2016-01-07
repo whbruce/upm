@@ -1,6 +1,11 @@
 /*
+<<<<<<< HEAD:src/grovegprs/grovegprs.cxx
  * Author: Jon Trulson <jtrulson@ics.com>
+=======
+ * Author: Henry Bruce <henry.bruce@intel.com>
+>>>>>>> ads1015_iadc: Updated author info:src/ads1x15/ads1015_iadc.cxx
  * Copyright (c) 2015 Intel Corporation.
+ * Based on work by Marc Graham <marc@m2ag.net>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
