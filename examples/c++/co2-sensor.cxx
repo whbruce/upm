@@ -26,11 +26,11 @@
 #include <iostream>
 #include "t6713.h"
 
-#define EDISON_I2C_BUS 1 
+#define EDISON_I2C_BUS 1
 #define FT4222_I2C_BUS 0
 
 //! [Interesting]
-// Simple example of using ICO2Sensor to determine 
+// Simple example of using ICO2Sensor to determine
 // which sensor is present and return its name.
 // ICO2Sensor is then used to get readings from sensor
 
@@ -42,16 +42,16 @@ upm::ICO2Sensor* getCO2Sensor()
       cO2Sensor = new upm::T6713(mraa_get_sub_platform_id(FT4222_I2C_BUS));
       return cO2Sensor;
    } catch (std::exception& e) {
-      std::cerr << "T6713: " << e.what() << std::endl;      
+      std::cerr << "T6713: " << e.what() << std::endl;
    }
-   return cO2Sensor;   
+   return cO2Sensor;
 }
 
 int main ()
 {
    upm::ICO2Sensor* cO2Sensor = getCO2Sensor();
    if (cO2Sensor == NULL) {
-      std::cout << "CO2 sensor not detected" << std::endl;                        
+      std::cout << "CO2 sensor not detected" << std::endl;
       return 1;
    }
    std::cout << "CO2 sensor " << cO2Sensor->getModuleName() << " detected" << std::endl;
@@ -62,10 +62,10 @@ int main ()
       } catch (std::exception& e) {
          std::cerr << e.what() << std::endl;
       }
-      sleep(1);         
+      sleep(1);
    }
    delete cO2Sensor;
    return 0;
 }
 
-//! [Interesting]      
+//! [Interesting]
