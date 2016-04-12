@@ -7,6 +7,7 @@
 
 #define EDISON_I2C_BUS 1            // Edison I2C-1
 #define DS1808_GPIO_PWR 15          // Edison GP165
+#define DS1808_GPIO_EDISON_LIVE 36  // Edison GP14
 
 void printState(upm::ILightController *lightController)
 {
@@ -26,7 +27,7 @@ int main( int argc, char **argv )
    upm::ILightController* lightController;
 
    try {
-      lightController = new upm::DS1808LC(DS1808_GPIO_PWR, EDISON_I2C_BUS);
+      lightController = new upm::DS1808LC(DS1808_GPIO_PWR, EDISON_I2C_BUS, DS1808_GPIO_EDISON_LIVE);
       std::cout <<  "Existing state: "; printState(lightController);
       if (argc == 2)
       {

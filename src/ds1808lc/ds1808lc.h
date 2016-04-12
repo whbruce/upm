@@ -53,10 +53,11 @@ namespace upm
 class DS1808LC : public upm::ILightController
 {
 public:
-   DS1808LC(int gpioPower, int i2cBus);
+   DS1808LC(int gpioPower, int i2cBus, int gpioLive);
    ~DS1808LC();
 
 protected:
+   bool isConfigured();
    const char* getModuleName() { return "ds1808lc"; }
    bool isPowered();
    void setPowerOn();
@@ -72,7 +73,8 @@ private:
 
    mraa::Result status;
    mraa::I2c* i2c;
-   int pinPower;
+   int pinPower, pinLive;
+   bool hasPoweredOn;
 };
 
 
