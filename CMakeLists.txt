@@ -8,9 +8,11 @@ endif ()
 find_package (Threads REQUIRED)
 find_package (PkgConfig REQUIRED)
 
+set (MRAA_MINIMUM_REQUIRED 0.9.1)
+
 # Force a libmraa search and minimum required version every time a config is generated
 unset(MRAA_FOUND CACHE)
-pkg_check_modules (MRAA REQUIRED mraa>=0.9.1)
+pkg_check_modules (MRAA REQUIRED mraa>=${MRAA_MINIMUM_REQUIRED})
 message (INFO " found mraa version: ${MRAA_VERSION}")
 
 # Appends the cmake/modules path to MAKE_MODULE_PATH variable.
@@ -192,7 +194,7 @@ if (IPK)
   set(CPACK_DEBIAN_PACKAGE_SECTION "libs")
   set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${TARGET_ARCH})
   set(CPACK_SYSTEM_NAME ${TARGET_ARCH})
-  set(CPACK_DEBIAN_PACKAGE_DEPENDS "mraa (>= ${MRAA_VERSION})")
+  set(CPACK_DEBIAN_PACKAGE_DEPENDS "libmraa0 (>= ${MRAA_MINIMUM_REQUIRED})")
   set(CPACK_DEBIAN_PACKAGE_PROVIDES "upm-dev, upm-dbg, upm-doc")
   set(CPACK_DEBIAN_PACKAGE_REPLACES ${CPACK_DEBIAN_PACKAGE_PROVIDES})
   set(CPACK_DEBIAN_PACKAGE_CONFLICTS ${CPACK_DEBIAN_PACKAGE_PROVIDES})
@@ -209,7 +211,7 @@ if (RPM)
       "${upm_VERSION_MAJOR}.${upm_VERSION_MINOR}.${upm_VERSION_PATCH}.${upm_PACKAGE_ON_TAG}${VERSION_COMMIT}")
   set(CPACK_PACKAGE_CONTACT "Intel IoT-Devkit")
   set(CPACK_PACKAGE_VENDOR "Intel IoT-Devkit")
-  set(CPACK_RPM_PACKAGE_REQUIRES "mraa >= ${MRAA_VERSION}")
+  set(CPACK_RPM_PACKAGE_REQUIRES "libmraa0 >= ${MRAA_MINIMUM_REQUIRED}")
   set(CPACK_RPM_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME}-devel")
   EXECUTE_PROCESS(COMMAND rpm --showrc
     COMMAND grep -E "dist[[:space:]]*\\."
