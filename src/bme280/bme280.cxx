@@ -27,21 +27,15 @@
 #include <stdlib.h>
 #include <math.h>
 #include <errno.h>
-
 #include "bme280.h"
 #include "bme280driver.h"
-/************** I2C buffer length ******/
+
 #define I2C_BUFFER_LEN 26
-
-
 
 using namespace upm;
 
-
-
-
 /*----------------------------------------------------------------------------*
- *      struct bme280_t parameters can be accessed by using bme280
+ *  struct bme280_t parameters can be accessed by using bme280
  *  bme280_t having the following parameters
  *  Bus write function pointer: BME280_WR_FUNC_PTR
     Bus read function pointer: BME280_RD_FUNC_PTR
@@ -50,82 +44,76 @@ using namespace upm;
  *  Chip id of the sensor: chip_id
  *---------------------------------------------------------------------------*/
 
-struct bme280_t bme280;
+// struct bme280_t bme280;
 
-static struct bme280_t *p_bme280; /**< pointer to BME280 */
 mraa::I2c* BME280::m_i2c = NULL;
 int BME280::m_bus = 0;
+bme280_t* BME280::bme280;
 
-BME280::BME280 (int bus, int devAddr) {
+BME280::BME280(int bus, int devAddr)
+{
     m_bus = bus;
     if( m_i2c == NULL)
     {
-            m_i2c = new mraa::I2c(m_bus);
-        m_i2c->address(BME280_I2C_ADDRESS1);
-        //Based on the requirement,  configure I2C interface.
+        m_i2c = new mraa::I2c(m_bus);
+        bme280 = new bme280_t();
+        // m_i2c->address(BME280_I2C_ADDRESS1);
         I2C_routine();
-        /*--------------------------------------------------------------------------*
-         *  This function used to assign the value/reference of
-         *  the following parameters
-         *  I2C address
-         *  Bus Write
-         *  Bus read
-         *  Chip id
-        *-------------------------------------------------------------------------*/
-        bme280_init(&bme280);
+        bme280_init(bme280);
     }
 }
 
-BME280::~BME280() {
+BME280::~BME280()
+{
     delete m_i2c;
 }
 
+#if 0
 /* This function is an example for reading sensor temperature
  *  \param: None
  *  \return: compensated temperature
  */
-
 int32_t BME280::getTemperatureInternal(void)
 {
     /* The variable used to read uncompensated temperature*/
     int32_t v_data_uncomp_tem_int32 =  getTemperatureRawInternal();
 
-/*------------------------------------------------------------------*
-************ START READ TRUE PRESSURE, TEMPERATURE AND HUMIDITY DATA ********
-*---------------------------------------------------------------------*/
+    /*------------------------------------------------------------------*
+    ************ START READ TRUE PRESSURE, TEMPERATURE AND HUMIDITY DATA ********
+    *---------------------------------------------------------------------*/
     /* API is used to read the true temperature*/
     /* Input value as uncompensated temperature and output format*/
     int32_t v_actual_temp_int32 = bme280_compensate_temperature_int32(v_data_uncomp_tem_int32);
-/*--------------------------------------------------------------------*
-************ END READ TRUE TEMPERATURE  ********
-*-------------------------------------------------------------------------*/
+    /*--------------------------------------------------------------------*
+    ************ END READ TRUE TEMPERATURE  ********
+    *-------------------------------------------------------------------------*/
 
-return v_actual_temp_int32;
+    return v_actual_temp_int32;
 }
+#endif
 
 /* This function is an example for reading sensor pressure
  *  \param: None
  *  \return: compensated pressure
  */
-
 int32_t BME280::getPressureInternal(void)
 {
     /* The variable used to read uncompensated pressure*/
     int32_t v_data_uncomp_pres_int32 = getPressureRawInternal();
 
 
-/*------------------------------------------------------------------*
-************ START READ TRUE PRESSURE DATA ********
-*---------------------------------------------------------------------*/
+    /*------------------------------------------------------------------*
+    ************ START READ TRUE PRESSURE DATA ********
+    *---------------------------------------------------------------------*/
     /* API is used to read the true pressure*/
     /* Input value as uncompensated pressure */
     uint32_t v_actual_press_uint32 = bme280_compensate_pressure_int32(v_data_uncomp_pres_int32);
 
-/*--------------------------------------------------------------------*
-************ END READ TRUE PRESSURE ********
-*-------------------------------------------------------------------------*/
+    /*--------------------------------------------------------------------*
+    ************ END READ TRUE PRESSURE ********
+    *-------------------------------------------------------------------------*/
 
-return v_actual_press_uint32;
+    return v_actual_press_uint32;
 }
 
 
@@ -133,24 +121,23 @@ return v_actual_press_uint32;
  *  \param: None
  *  \return: compensated humidity
  */
-
 int32_t BME280::getHumidityInternal(void)
 {
     /* The variable used to read uncompensated pressure*/
     int32_t v_data_uncomp_hum_int32 = getHumidityRawInternal();
 
-/*------------------------------------------------------------------*
-************ START READ TRUE HUMIDITY DATA ********
-*---------------------------------------------------------------------*/
+    /*------------------------------------------------------------------*
+    ************ START READ TRUE HUMIDITY DATA ********
+    *---------------------------------------------------------------------*/
     /* API is used to read the true humidity*/
     /* Input value as uncompensated humidity and output format*/
      uint32_t  v_actual_humity_uint32 = bme280_compensate_humidity_int32(v_data_uncomp_hum_int32);
 
-/*--------------------------------------------------------------------*
-************ END READ TRUE HUMIDITY ********
-*-------------------------------------------------------------------------*/
+    /*--------------------------------------------------------------------*
+    ************ END READ TRUE HUMIDITY ********
+    *-------------------------------------------------------------------------*/
 
-return v_actual_humity_uint32;
+    return v_actual_humity_uint32;
 }
 
 
@@ -160,7 +147,7 @@ return v_actual_humity_uint32;
  *  \return: uncompensated temperature
  */
 
-int32_t BME280::getTemperatureRawInternal(void)
+int32_t BME280::getTemperatureInternal(void)
 {
     /* The variable used to read uncompensated temperature*/
     int32_t v_data_uncomp_tem_int32 = BME280_INIT_VALUE;
@@ -180,22 +167,22 @@ int32_t BME280::getTemperatureRawInternal(void)
     /* set the temperature oversampling*/
     bme280_set_oversamp_temperature(BME280_OVERSAMP_4X);
 
-/************************* END INITIALIZATION *************************/
+    /************************* END INITIALIZATION *************************/
 
-/*------------------------------------------------------------------*
-************ START READ UNCOMPENSATED TEMPERATURE  DATA ********
-*---------------------------------------------------------------------*/
+    /*------------------------------------------------------------------*
+    ************ START READ UNCOMPENSATED TEMPERATURE  DATA ********
+    *---------------------------------------------------------------------*/
     /* API is used to read the uncompensated temperature*/
     bme280_read_uncomp_temperature(&v_data_uncomp_tem_int32);
+printf("v_data_uncomp_tem_int32 = %d\n", v_data_uncomp_tem_int32);
 
+    /*--------------------------------------------------------------------*
+    ************ END READ UNCOMPENSATED TEMPERATURE  ********
+    *-------------------------------------------------------------------------*/
 
-/*--------------------------------------------------------------------*
-************ END READ UNCOMPENSATED TEMPERATURE  ********
-*-------------------------------------------------------------------------*/
-
-/*-----------------------------------------------------------------------*
-************************* START DE-INITIALIZATION ***********************
-*-------------------------------------------------------------------------*/
+    /*-----------------------------------------------------------------------*
+    ************************* START DE-INITIALIZATION ***********************
+    *-------------------------------------------------------------------------*/
     /*  For de-initialization it is required to set the mode of
      *  the sensor as "SLEEP"
      *  the device reaches the lowest power consumption only
@@ -204,17 +191,20 @@ int32_t BME280::getTemperatureRawInternal(void)
      *  by using the below API able to set the power mode as SLEEP*/
      /* Set the power mode as SLEEP*/
     bme280_set_power_mode(BME280_SLEEP_MODE);
-/*---------------------------------------------------------------------*
-************************* END DE-INITIALIZATION **********************
-*---------------------------------------------------------------------*/
-return v_data_uncomp_tem_int32;
+    /*---------------------------------------------------------------------*
+    ************************* END DE-INITIALIZATION **********************
+    *---------------------------------------------------------------------*/
+    /* Input value as uncompensated temperature and output format*/
+    int32_t v_actual_temp_int32 = bme280_compensate_temperature_int32(v_data_uncomp_tem_int32);
+
+    return v_actual_temp_int32;
 }
+
 
 /* This function is an example for reading sensor pressure
  *  \param: None
  *  \return: uncompensated pressure
  */
-
 int32_t BME280::getPressureRawInternal(void)
 {
     /* The variable used to read uncompensated pressure*/
@@ -240,23 +230,23 @@ int32_t BME280::getPressureRawInternal(void)
     /* set the pressure oversampling*/
     bme280_set_oversamp_pressure(BME280_OVERSAMP_2X);
 
-/************************* END INITIALIZATION *************************/
+    /************************* END INITIALIZATION *************************/
 
-/*------------------------------------------------------------------*
-************ START READ UNCOMPENSATED PRESSURE DATA ********
-*---------------------------------------------------------------------*/
+    /*------------------------------------------------------------------*
+    ************ START READ UNCOMPENSATED PRESSURE DATA ********
+    *---------------------------------------------------------------------*/
 
     /* API is used to read the uncompensated pressure*/
     bme280_read_uncomp_pressure(&v_data_uncomp_pres_int32);
 
-/*--------------------------------------------------------------------*
-************ END READ UNCOMPENSATED PRESSURE ********
-*-------------------------------------------------------------------------*/
+    /*--------------------------------------------------------------------*
+    ************ END READ UNCOMPENSATED PRESSURE ********
+    *-------------------------------------------------------------------------*/
 
 
-/*-----------------------------------------------------------------------*
-************************* START DE-INITIALIZATION ***********************
-*-------------------------------------------------------------------------*/
+    /*-----------------------------------------------------------------------*
+    ************************* START DE-INITIALIZATION ***********************
+    *-------------------------------------------------------------------------*/
     /*  For de-initialization it is required to set the mode of
      *  the sensor as "SLEEP"
      *  the device reaches the lowest power consumption only
@@ -265,10 +255,10 @@ int32_t BME280::getPressureRawInternal(void)
      *  by using the below API able to set the power mode as SLEEP*/
      /* Set the power mode as SLEEP*/
     bme280_set_power_mode(BME280_SLEEP_MODE);
-/*---------------------------------------------------------------------*
-************************* END DE-INITIALIZATION **********************
-*---------------------------------------------------------------------*/
-return v_data_uncomp_pres_int32;
+    /*---------------------------------------------------------------------*
+    ************************* END DE-INITIALIZATION **********************
+    *---------------------------------------------------------------------*/
+    return v_data_uncomp_pres_int32;
 }
 
 
@@ -276,7 +266,6 @@ return v_data_uncomp_pres_int32;
  *  \param: None
  *  \return: uncompensated humidity
  */
-
 int32_t BME280::getHumidityRawInternal(void)
 {
     /* The variable used to read uncompensated pressure*/
@@ -300,22 +289,22 @@ int32_t BME280::getHumidityRawInternal(void)
     bme280_set_oversamp_humidity(BME280_OVERSAMP_1X);
 
 
-/************************* END INITIALIZATION *************************/
+    /************************* END INITIALIZATION *************************/
 
-/*------------------------------------------------------------------*
-************ START READ HUMIDITY DATA ********
-*---------------------------------------------------------------------*/
+    /*------------------------------------------------------------------*
+    ************ START READ HUMIDITY DATA ********
+    *---------------------------------------------------------------------*/
     /* API is used to read the uncompensated humidity*/
         bme280_read_uncomp_humidity(&v_data_uncomp_hum_int32);
 
-/*--------------------------------------------------------------------*
-************ END READ UNCOMPENSATED PRESSURE AND TEMPERATURE********
-*-------------------------------------------------------------------------*/
+    /*--------------------------------------------------------------------*
+    ************ END READ UNCOMPENSATED PRESSURE AND TEMPERATURE********
+    *-------------------------------------------------------------------------*/
 
 
-/*-----------------------------------------------------------------------*
-************************* START DE-INITIALIZATION ***********************
-*-------------------------------------------------------------------------*/
+    /*-----------------------------------------------------------------------*
+    ************************* START DE-INITIALIZATION ***********************
+    *-------------------------------------------------------------------------*/
     /*  For de-initialization it is required to set the mode of
      *  the sensor as "SLEEP"
      *  the device reaches the lowest power consumption only
@@ -324,14 +313,11 @@ int32_t BME280::getHumidityRawInternal(void)
      *  by using the below API able to set the power mode as SLEEP*/
      /* Set the power mode as SLEEP*/
     bme280_set_power_mode(BME280_SLEEP_MODE);
-/*---------------------------------------------------------------------*
-************************* END DE-INITIALIZATION **********************
-*---------------------------------------------------------------------*/
-return v_data_uncomp_hum_int32;
+    /*---------------------------------------------------------------------*
+    ************************* END DE-INITIALIZATION **********************
+    *---------------------------------------------------------------------*/
+    return v_data_uncomp_hum_int32;
 }
-
-
-
 
 
 /*--------------------------------------------------------------------------*
@@ -348,12 +334,12 @@ int8_t BME280::I2C_routine()
  *  I2C address: dev_addr
  *--------------------------------------------------------------------------*/
 //  bme280.bus_write = &BME280::BME280_I2C_bus_write;
-    bme280.bus_write = BME280_I2C_bus_write;
+    bme280->bus_write = &BME280_I2C_bus_write;
 
     //bme280.bus_write = BME280_I2C_bus_write_dummy;
-    bme280.bus_read = BME280_I2C_bus_read;
-    bme280.dev_addr = BME280_I2C_ADDRESS1;
-    bme280.delay_msec = BME280_delay_msek;
+    bme280->bus_read = &BME280::BME280_I2C_bus_read;
+    bme280->dev_addr = BME280_I2C_ADDRESS1;
+    bme280->delay_msec = BME280_delay_msek;
 
     return BME280_INIT_VALUE;
 }
@@ -375,6 +361,7 @@ int32_t BME280::i2c_write_string(uint8_t dev_addr,uint8_t* ptr, uint8_t cnt)
     return 0;
 }
 
+
 /*  \Brief: The function is used as I2C bus write
 *   \Return : Status of the I2C write
 *   \param dev_addr : The device address of the sensor
@@ -383,7 +370,6 @@ int32_t BME280::i2c_write_string(uint8_t dev_addr,uint8_t* ptr, uint8_t cnt)
 *       will be used for write the value into the register
 *   \param cnt : The no of byte of data to be write
 */
-
 int8_t BME280::BME280_I2C_bus_write(uint8_t dev_addr, uint8_t reg_addr, uint8_t *reg_data, uint8_t cnt)
 
 {
@@ -400,10 +386,11 @@ int8_t BME280::BME280_I2C_bus_write(uint8_t dev_addr, uint8_t reg_addr, uint8_t 
     return (int8_t)iError;
 }
 
+
 int32_t BME280::i2c_write_read_string(uint8_t dev_addr,uint8_t reg_addr , uint8_t * ptr, uint8_t cnt)
 {
-     mraa::Result ret;
-
+    mraa::Result ret;
+printf("i2c_write_read_string %d\n", cnt);
     m_i2c->address(dev_addr);
 
     if( m_i2c->readBytesReg(reg_addr, ptr, cnt) != cnt)
@@ -411,6 +398,9 @@ int32_t BME280::i2c_write_read_string(uint8_t dev_addr,uint8_t reg_addr , uint8_
         UPM_THROW("bme280 register read failed");
 
     }
+    for (int i=0; i<cnt; ++i)
+        printf("%d ", ptr[i]);
+    printf("\n");
     return 0;
 }
 
@@ -453,31 +443,26 @@ void BME280::BME280_delay_msek(uint16_t mseconds)
 /**
  * Get temperature measurement.
  */
-uint16_t BME280::getTemperatureRaw (){ return BME280::getTemperatureRawInternal(); }
-
-/**
- * Get temperature measurement.
- */
-int BME280::getTemperatureCelcius (){ return (BME280::getTemperatureInternal() + 50) /100; }
-/**
- * Get relative humidity measurement.
- */
-uint16_t BME280::getHumidityRaw (){ return BME280::getHumidityRawInternal(); }
+int BME280::getTemperatureCelcius()
+{
+    return (getTemperatureInternal() + 50) /100;
+}
 
 /**
  * Get relative humidity measurement.
  */
-int BME280::getHumidityRelative (){ return (BME280::getHumidityInternal() + 500) / 1000; }
-
-/**
- * Return pressure
- */
-uint32_t BME280::getPressureRaw(){  return BME280::getPressureRawInternal(); }
+int BME280::getHumidityRelative ()
+{
+    return (getHumidityInternal() + 500) / 1000;
+}
 
 /**
  * Return calculated pressure (Pa)
  */
-int BME280::getPressurePa(){ return BME280::getPressureInternal(); }
+int BME280::getPressurePa()
+{
+    return getPressureInternal();
+}
 
 
 

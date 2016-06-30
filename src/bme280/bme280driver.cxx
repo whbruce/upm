@@ -50,7 +50,7 @@
 * No license is granted by implication or otherwise under any patent or
 * patent rights of the copyright holder.
 **************************************************************************/
-
+#include <stdio.h>
 #include "bme280driver.h"
 static struct bme280_t *p_bme280; /**< pointer to BME280 */
 
@@ -143,6 +143,10 @@ s32 *v_uncomp_temperature_s32)
 			| ((u32)a_data_u8r[BME280_TEMPERATURE_XLSB_DATA] >>
 			BME280_SHIFT_BIT_POSITION_BY_04_BITS));
 		}
+
+		for (int i=0; i<3; ++i)
+			printf("%d ", a_data_u8r[i]);
+		printf("\n");
 	return com_rslt;
 }
 /*!
